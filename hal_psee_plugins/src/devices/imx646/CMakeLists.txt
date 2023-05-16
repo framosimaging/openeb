@@ -7,25 +7,6 @@
 # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-add_subdirectory(utils)
-add_subdirectory(common)
-add_subdirectory(treuzell)
-add_subdirectory(gen31)
-add_subdirectory(gen41)
-add_subdirectory(imx636)
-add_subdirectory(imx646)
-
-if(NOT ANDROID)
-    add_subdirectory(genx320)
-endif(NOT ANDROID)
-
-if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/saphir")
-    add_subdirectory(saphir)
-endif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/saphir")
-
-add_subdirectory(psee-video)
-add_subdirectory(others)
-
-if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/sensorlib")
-    add_subdirectory(sensorlib)
-endif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/sensorlib")
+target_sources(metavision_hal_imx646_evk3_system_obj PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/imx646_tz_device.cpp
+)

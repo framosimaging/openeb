@@ -16,6 +16,7 @@ target_sources(hal_plugin_gen41_evk3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/psee_ge
 target_sources(hal_plugin_imx636_evk2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/psee_imx636_evk2.cpp)
 target_sources(hal_plugin_imx636_evk3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/psee_imx636_evk3.cpp)
 target_sources(hal_plugin_imx636_evk4 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/psee_imx636_evk4.cpp)
+target_sources(hal_plugin_imx646_evk3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/psee_imx646_evk3.cpp)
 target_sources(hal_plugin_prophesee PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/psee_universal.cpp)
 
 if(NOT ANDROID)

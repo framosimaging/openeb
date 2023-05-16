@@ -145,6 +145,7 @@ set(lib_camera_obj_list
         metavision_hal_gen41_evk3_system_obj
         metavision_hal_imx636_evk2_system_obj
         metavision_hal_imx636_evk3_system_obj
+        metavision_hal_imx646_evk3_system_obj
         metavision_hal_psee_lab_obj
 )
 
@@ -219,6 +220,7 @@ set(plugin_list
     hal_plugin_imx636_evk2
     hal_plugin_imx636_evk3
     hal_plugin_imx636_evk4
+    hal_plugin_imx646_evk3
     hal_plugin_prophesee
 )
 if(NOT ANDROID)
@@ -459,6 +461,21 @@ target_link_libraries(hal_plugin_genx320es_evk3
         metavision_hal_genx320_cx3_system_obj
 )
 endif(NOT ANDROID)
+
+# Linkage with generic hal plugin object
+target_sources(hal_plugin_imx646_evk3
+        PRIVATE
+        $<TARGET_OBJECTS:metavision_hal_treuzell_protocol_obj>
+        $<TARGET_OBJECTS:metavision_hal_ti_tmp103_obj>
+        $<TARGET_OBJECTS:metavision_hal_imx646_evk3_system_obj>
+        )
+
+target_link_libraries(hal_plugin_imx646_evk3
+        PRIVATE
+        metavision_hal_treuzell_protocol_obj
+        metavision_hal_ti_tmp103_obj
+        metavision_hal_imx646_evk3_system_obj
+        )
 
 foreach(object ${lib_camera_obj_list})
     # Linkage with generic hal plugin object
