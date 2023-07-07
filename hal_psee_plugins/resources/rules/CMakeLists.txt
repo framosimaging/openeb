@@ -7,7 +7,7 @@
 # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-if((NOT WIN32) AND (NOT APPLE) AND (NOT ANDROID))
+if((NOT WIN32) AND (NOT APPLE) AND (NOT ANDROID) AND (NOT V4L2))
 
     option(UDEV_RULES_SYSTEM_INSTALL  "Install udev rules on your system files" ON)
     set(rules

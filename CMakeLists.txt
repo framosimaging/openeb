@@ -333,7 +333,7 @@ endif(CODE_COVERAGE)
 
 ################################################### Detect which SDK modules are available
 
-set(METAVISION_SDK_MODULES_OPEN base core driver CACHE STRING "SDK Open modules")
+set(METAVISION_SDK_MODULES_OPEN base embedded core driver CACHE STRING "SDK Open modules")
 if (COMPILE_PYTHON3_BINDINGS)
     list(APPEND METAVISION_SDK_MODULES_OPEN core_ml)
 endif (COMPILE_PYTHON3_BINDINGS)
