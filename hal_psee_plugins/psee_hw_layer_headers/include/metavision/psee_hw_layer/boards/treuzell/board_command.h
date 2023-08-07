@@ -9,36 +9,32 @@
  * See the License for the specific language governing permissions and limitations under the License.                 *
  **********************************************************************************************************************/
 
-#ifndef METAVISION_HAL_TZ_PSEE_VIDEO_H
-#define METAVISION_HAL_TZ_PSEE_VIDEO_H
+#ifndef METAVISION_HAL_BOARD_COMMAND_H
+#define METAVISION_HAL_BOARD_COMMAND_H
 
-#include "metavision/psee_hw_layer/devices/treuzell/tz_psee_fpga_device.h"
-#include "metavision/psee_hw_layer/devices/treuzell/tz_main_device.h"
+#include <cstdint>
+#include <vector>
+#include <string>
+#include <memory>
 
 namespace Metavision {
 
-class BoardCommand;
+class TzCtrlFrame;
+class DataTransfer;
 
-class TzPseeVideo : public TzPseeFpgaDevice, public TzMainDevice {
+class BoardCommand {
 public:
-    TzPseeVideo(std::shared_ptr<BoardCommand> cmd, uint32_t dev_id, std::shared_ptr<TzDevice> parent);
-    virtual ~TzPseeVideo();
-    virtual void spawn_facilities(DeviceBuilder &device_builder, const DeviceConfig &device_config);
-    static std::shared_ptr<TzDevice> build(std::shared_ptr<BoardCommand> cmd, uint32_t dev_id,
-                                           std::shared_ptr<TzDevice> parent);
-
-    virtual std::list<StreamFormat> get_supported_formats() const override;
-    StreamFormat get_output_format() const override;
-    virtual long get_system_id() const;
-    virtual bool set_mode_standalone();
-    virtual bool set_mode_master();
-    virtual bool set_mode_slave();
-    virtual I_CameraSynchronization::SyncMode get_mode() const;
-    virtual I_HW_Identification::SensorInfo get_sensor_info() {
-        return {0, 0, "Gen0.0"};
-    }
+    virtual std::vector<uint32_t> read_device_register(uint32_t device, uint32_t address, int nval = 1) = 0;
+    virtual void write_device_register(uint32_t device, uint32_t address, const std::vector<uint32_t> &val) = 0;
+    virtual void transfer_tz_frame(TzCtrlFrame &req) = 0;
+    virtual uint32_t get_device_count() = 0;
+    virtual std::string get_name() = 0;
+    virtual std::string get_serial() = 0;
+    virtual std::unique_ptr<Metavision::DataTransfer> build_data_transfer(uint32_t raw_event_size_bytes);
+    virtual long get_board_speed();
+    virtual std::string get_manufacturer();
+    virtual uint32_t get_version();
+    virtual time_t get_build_date();
 };
-
-} // namespace Metavision
-
-#endif // METAVISION_HAL_TZ_PSEE_VIDEO_H
+}
+#endif // METAVISION_HAL_BOARD_COMMAND_H
