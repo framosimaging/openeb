@@ -73,9 +73,6 @@ private:
 
     uint32_t start_threshold_{6};
     uint32_t stop_threshold_{4};
-
-    RegisterMap &regmap();
-    const RegisterMap &regmap() const;
 };
 
 } // namespace Metavision

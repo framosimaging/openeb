@@ -282,12 +282,4 @@ uint32_t AntiFlickerFilter::get_max_supported_stop_threshold() const {
     return (1 << 3) - 1;
 }
 
-RegisterMap &AntiFlickerFilter::regmap() {
-    return dev_->regmap();
-}
-
-const RegisterMap &AntiFlickerFilter::regmap() const {
-    return dev_->regmap();
-}
-
 } // namespace Metavision

@@ -82,7 +82,7 @@ public:
     virtual bool set_mode_slave() override {
         return false;
     }
-    virtual SyncMode get_mode() override {
+    virtual SyncMode get_mode() const override {
         return SyncMode::STANDALONE;
     }
 };
