@@ -119,7 +119,7 @@ unsigned int V4L2BoardCommand::get_device_count() {
 }
 
 std::vector<uint32_t> V4L2BoardCommand::read_device_register(uint32_t device, uint32_t address, int nval) {
-    std::vector<uint32_t> res(nval);
+    std::vector<uint32_t> res;
     struct v4l2_dbg_match match;
     struct v4l2_dbg_register get_reg;
     int i, retval;
@@ -132,6 +132,7 @@ std::vector<uint32_t> V4L2BoardCommand::read_device_register(uint32_t device, ui
         get_reg.reg = address + i;
         if ((retval = ioctl(sensor_fd_, VIDIOC_DBG_G_REGISTER, &get_reg)) < 0)
             throw std::runtime_error("ioctl: VIDIOC_DBG_G_REGISTER failed to read register");
+
         res.push_back(get_reg.val);
     }
 
