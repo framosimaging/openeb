@@ -68,24 +68,24 @@ bool V4l2CameraDiscovery::discover(DeviceBuilder &device_builder, const std::str
 
     std::vector<std::string> device_names = {
         // We might want to iterate over all /dev/mediaX files
-        "/dev/media0", "/dev/media1", "/dev/media2", "/dev/media3", "/dev/media4",
+        "/dev/media0",
+        /* "/dev/media0", "/dev/media1", "/dev/media2", "/dev/media3", "/dev/media4", */
     };
 
-    std::vector<std::shared_ptr<V4L2BoardCommand>> devices;
     for (auto device_name : device_names) {
         try {
-            devices.emplace_back(std::make_shared<V4L2BoardCommand>(device_name));
+            devices_.emplace_back(std::make_shared<V4L2BoardCommand>(device_name));
         } catch (std::exception &e) {
             MV_HAL_LOG_TRACE() << "Cannot open V4L2 device '" << device_name << "' (err: " << e.what();
         }
     }
 
-    if (devices.empty()) {
+    if (devices_.empty()) {
         return false;
     }
 
 
-    auto &main_device  = devices[0];
+    auto &main_device  = devices_[0];
     auto software_info = device_builder.get_plugin_software_info();
     // TODO: Request sensor/board info and select which regmap to generate
     // hardcoded to Genx320 for now
@@ -118,11 +118,10 @@ bool V4l2CameraDiscovery::discover(DeviceBuilder &device_builder, const std::str
             register_map, hw_id->get_sensor_info(), ""));
 
         device_builder.add_facility(std::make_unique<V4l2Synchronization>());
-        device_builder.add_facility(std::make_unique<GenX320Erc>(register_map));
+	device_builder.add_facility(std::make_unique<GenX320Erc>(register_map));
         device_builder.add_facility(std::make_unique<GenX320LowLevelRoi>(config, register_map, ""));
         device_builder.add_facility(std::make_unique<GenX320LLBiases>(register_map, config));
-        device_builder.add_facility(
-            std::make_unique<GenX320TzTriggerEvent>(register_map, ""));
+        device_builder.add_facility(std::make_unique<GenX320TzTriggerEvent>(register_map, ""));
     } catch (std::exception &e) { MV_HAL_LOG_ERROR() << "Failed to build streaming facilities :" << e.what(); }
 
     MV_HAL_LOG_INFO() << "V4l2 Discovery with great success +1";

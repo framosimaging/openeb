@@ -15,12 +15,15 @@
 #include "metavision/hal/utils/camera_discovery.h"
 
 namespace Metavision {
+class V4L2BoardCommand;
 
 class V4l2CameraDiscovery : public CameraDiscovery {
     SerialList list() override;
     SystemList list_available_sources() override;
     bool discover(DeviceBuilder &device_builder, const std::string &serial, const DeviceConfig &config) override;
     bool is_for_local_camera() const override;
+    std::vector<std::shared_ptr<V4L2BoardCommand>> devices_;
+
 };
 
 } // namespace Metavision
