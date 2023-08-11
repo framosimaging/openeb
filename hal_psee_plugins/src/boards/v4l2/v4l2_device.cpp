@@ -133,11 +133,11 @@ I_HW_Identification::SensorInfo V4l2HwIdentification::get_sensor_info() const {
 }
 std::vector<std::string> V4l2HwIdentification::get_available_data_encoding_formats() const {
     // @TODO Retrieve those info through V4L2
-    return {"EVT3", "EVT2"};
+    return {"EVT3", "EVT21"};
 }
 std::string V4l2HwIdentification::get_current_data_encoding_format() const {
     // @TODO Retrieve those info through V4L2
-    return "EVT3;height=320;width=320";
+    return "EVT21;height=320;width=320";
 }
 std::string V4l2HwIdentification::get_serial() const {
     std::stringstream ss;
