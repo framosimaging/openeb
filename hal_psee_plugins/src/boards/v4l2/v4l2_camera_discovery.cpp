@@ -49,7 +49,7 @@
 namespace Metavision {
 
 using RegmapData = RegisterMap::RegmapData;
-std::string ROOT_PREFIX   = "PSEE/GENX320/";
+std::string ROOT_PREFIX   = "";
 bool V4l2CameraDiscovery::is_for_local_camera() const {
     return true;
 }
