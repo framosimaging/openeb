@@ -94,10 +94,10 @@ bool V4l2CameraDiscovery::discover(DeviceBuilder &device_builder, const std::str
 
     // TODO: use shadow values in otder to avoid too many i2c accesses.
     // build a V4l2DeviceWithRegmap structure for this.
-    register_map->set_read_cb([this, &main_device](uint32_t address) {
-        return main_device->read_device_register(0, address, 1)[0];
+    register_map->set_read_cb([this](uint32_t address) {
+        return this->devices_[0]->read_device_register(0, address, 1)[0];
     });
-    register_map->set_write_cb([this, &main_device](uint32_t address, uint32_t v) { main_device->write_device_register(0, address, {v}); });
+    register_map->set_write_cb([this](uint32_t address, uint32_t v) { this->devices_[0]->write_device_register(0, address, {v}); });
 
     try {
         auto hw_id = device_builder.add_facility(
