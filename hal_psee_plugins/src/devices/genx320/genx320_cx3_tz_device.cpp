@@ -67,11 +67,10 @@ void TzCx3GenX320::spawn_facilities(DeviceBuilder &device_builder, const DeviceC
         std::make_unique<GenX320TzTriggerEvent>(register_map, SENSOR_PREFIX));
     device_builder.add_facility(std::make_unique<GenX320LowLevelRoi>(device_config, register_map, SENSOR_PREFIX));
     device_builder.add_facility(std::make_unique<GenX320LLBiases>(register_map, device_config));
-    // FIXME: make_shared called on a reference
     device_builder.add_facility(std::make_unique<AntiFlickerFilter>(
-        std::make_shared<RegisterMap>(regmap()), get_sensor_info(), SENSOR_PREFIX));
+        register_map, get_sensor_info(), SENSOR_PREFIX));
     device_builder.add_facility(std::make_unique<EventTrailFilter>(
-        std::make_shared<RegisterMap>(regmap()), get_sensor_info(), SENSOR_PREFIX));
+        register_map, get_sensor_info(), SENSOR_PREFIX));
     device_builder.add_facility(std::make_unique<GenX320Erc>(register_map));
     device_builder.add_facility(std::make_unique<GenX320NoiseFilter>(register_map));
 }

@@ -80,11 +80,10 @@ bool TzImx646::can_build(std::shared_ptr<BoardCommand> cmd, uint32_t dev_id) {
 }
 
 void TzImx646::spawn_facilities(DeviceBuilder &device_builder, const DeviceConfig &device_config) {
-    // FIXME: make_shared called on a reference
     device_builder.add_facility(std::make_unique<EventTrailFilter>(
-        std::make_shared<RegisterMap>(regmap()), get_sensor_info(), SENSOR_PREFIX));
+        register_map, get_sensor_info(), SENSOR_PREFIX));
     device_builder.add_facility(std::make_unique<AntiFlickerFilter>(
-        std::make_shared<RegisterMap>(regmap()), get_sensor_info(), SENSOR_PREFIX));
+        register_map, get_sensor_info(), SENSOR_PREFIX));
 
     auto erc = device_builder.add_facility(
         std::make_unique<Gen41Erc>(register_map, SENSOR_PREFIX + "erc/", shared_from_this()));
