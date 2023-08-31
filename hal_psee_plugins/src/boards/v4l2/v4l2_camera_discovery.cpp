@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <cstring>
 #include <iterator>
 #include <memory>
@@ -33,23 +34,11 @@
 #include "metavision/hal/utils/hal_log.h"
 #include "metavision/psee_hw_layer/utils/psee_format.h"
 #include "metavision/psee_hw_layer/boards/v4l2/v4l2_board_command.h"
-#include "metavision/psee_hw_layer/devices/treuzell/tz_regmap_device.h"
-
-#include "metavision/psee_hw_layer/devices/genx320/genx320_erc.h"
-#include "metavision/psee_hw_layer/devices/genx320/genx320_ll_roi.h"
-#include "metavision/psee_hw_layer/devices/genx320/genx320_ll_biases.h"
-#include "metavision/psee_hw_layer/devices/common/antiflicker_filter.h"
-#include "metavision/psee_hw_layer/devices/common/event_trail_filter.h"
-#include "metavision/psee_hw_layer/devices/genx320/genx320_tz_trigger_event.h"
-
-#include "devices/genx320/register_maps/genx320es_registermap.h"
 
 #include "utils/make_decoder.h"
 
 namespace Metavision {
 
-using RegmapData = RegisterMap::RegmapData;
-std::string ROOT_PREFIX   = "";
 bool V4l2CameraDiscovery::is_for_local_camera() const {
     return true;
 }
@@ -84,44 +73,10 @@ bool V4l2CameraDiscovery::discover(DeviceBuilder &device_builder, const std::str
         return false;
     }
 
-
     auto &main_device  = devices_[0];
-    auto software_info = device_builder.get_plugin_software_info();
-    // TODO: Request sensor/board info and select which regmap to generate
-    // hardcoded to Genx320 for now
-    auto regmap_data = RegisterMap::RegmapData(1 ,std::make_tuple(GenX320ESRegisterMap, GenX320ESRegisterMapSize, ROOT_PREFIX, 0));
-    auto register_map = std::make_shared<RegisterMap>(regmap_data);
-
-    // TODO: use shadow values in otder to avoid too many i2c accesses.
-    // build a V4l2DeviceWithRegmap structure for this.
-    register_map->set_read_cb([this](uint32_t address) {
-        return this->devices_[0]->read_device_register(0, address, 1)[0];
-    });
-    register_map->set_write_cb([this](uint32_t address, uint32_t v) { this->devices_[0]->write_device_register(0, address, {v}); });
 
     try {
-        auto hw_id = device_builder.add_facility(
-            std::make_unique<V4l2HwIdentification>(main_device->get_device()->get_capability(), software_info));
-
-        auto encoding_format = StreamFormat(hw_id->get_current_data_encoding_format());
-        size_t raw_size_bytes;
-        auto decoder = make_decoder(device_builder, encoding_format, raw_size_bytes, false);
-
-        device_builder.add_facility(std::make_unique<Metavision::I_EventsStream>(
-            main_device->build_data_transfer(raw_size_bytes), hw_id, decoder, main_device->get_device()));
-
-    // FIXME: make_shared called on a reference
-        device_builder.add_facility(std::make_unique<AntiFlickerFilter>(
-            register_map, hw_id->get_sensor_info(), ""));
-
-        device_builder.add_facility(std::make_unique<EventTrailFilter>(
-            register_map, hw_id->get_sensor_info(), ""));
-
-        device_builder.add_facility(std::make_unique<V4l2Synchronization>());
-	device_builder.add_facility(std::make_unique<GenX320Erc>(register_map));
-        device_builder.add_facility(std::make_unique<GenX320LowLevelRoi>(config, register_map, ""));
-        device_builder.add_facility(std::make_unique<GenX320LLBiases>(register_map, config));
-        device_builder.add_facility(std::make_unique<GenX320TzTriggerEvent>(register_map, ""));
+        builder->build_device(main_device, device_builder, config);
     } catch (std::exception &e) { MV_HAL_LOG_ERROR() << "Failed to build streaming facilities :" << e.what(); }
 
     MV_HAL_LOG_INFO() << "V4l2 Discovery with great success +1";

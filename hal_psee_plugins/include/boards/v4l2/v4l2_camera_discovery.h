@@ -13,6 +13,7 @@
 #define METAVISION_HAL_PSEE_PLUGINS_V4L2_CAMERA_DISCOVERY
 
 #include "metavision/hal/utils/camera_discovery.h"
+#include "devices/v4l2/v4l2_device_builder.h"
 
 namespace Metavision {
 class V4L2BoardCommand;
@@ -23,6 +24,8 @@ class V4l2CameraDiscovery : public CameraDiscovery {
     bool discover(DeviceBuilder &device_builder, const std::string &serial, const DeviceConfig &config) override;
     bool is_for_local_camera() const override;
     std::vector<std::shared_ptr<V4L2BoardCommand>> devices_;
+private:
+    std::unique_ptr<V4L2DeviceBuilder> builder;
 
 };
 
