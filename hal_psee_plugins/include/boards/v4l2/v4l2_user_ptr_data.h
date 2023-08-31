@@ -24,11 +24,11 @@ namespace Metavision {
  * facility.
  */
 class DmaBufHeap;
-class V4l2Device;
+class V4L2DeviceControl;
 
 class V4l2DeviceUserPtr {
 public:
-    V4l2DeviceUserPtr(std::shared_ptr<V4l2Device> device, const std::string &heap_path, const std::string &heap_name,
+    V4l2DeviceUserPtr(std::shared_ptr<V4L2DeviceControl> device, const std::string &heap_path, const std::string &heap_name,
                       std::size_t length = 8 * 1024 * 1024, unsigned int nb_buffers = 32);
 
     virtual ~V4l2DeviceUserPtr();
@@ -54,7 +54,7 @@ private:
         unsigned int dmabuf_fd;
     };
 
-    std::shared_ptr<V4l2Device> device_;
+    std::shared_ptr<V4L2DeviceControl> device_;
     std::unique_ptr<DmaBufHeap> dma_buf_heap_;
     std::size_t length_;
     std::vector<BufferDesc> buffers_desc_;

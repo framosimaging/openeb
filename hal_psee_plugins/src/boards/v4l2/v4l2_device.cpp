@@ -26,7 +26,7 @@ void Metavision::raise_error(const std::string &str) {
     throw std::runtime_error(str + " (" + std::to_string(errno) + " - " + std::strerror(errno) + ")");
 }
 
-V4l2Device::V4l2Device(const std::string &dev_name) {
+V4L2DeviceControl::V4L2DeviceControl(const std::string &dev_name) {
     struct stat st;
     if (-1 == stat(dev_name.c_str(), &st))
         raise_error(dev_name + "Cannot identify device.");
@@ -66,7 +66,7 @@ V4l2Device::V4l2Device(const std::string &dev_name) {
         raise_error("VIDIOC_S_FMT failed");
 }
 
-V4l2RequestBuffers V4l2Device::request_buffers(v4l2_memory memory, uint32_t nb_buffers) {
+V4l2RequestBuffers V4L2DeviceControl::request_buffers(v4l2_memory memory, uint32_t nb_buffers) {
     V4l2RequestBuffers req{0};
     req.count  = nb_buffers;
     req.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -79,7 +79,7 @@ V4l2RequestBuffers V4l2Device::request_buffers(v4l2_memory memory, uint32_t nb_b
     return req;
 }
 
-V4l2Buffer V4l2Device::query_buffer(v4l2_memory memory_type, uint32_t buf_index) {
+V4l2Buffer V4L2DeviceControl::query_buffer(v4l2_memory memory_type, uint32_t buf_index) {
     V4l2Buffer buf{0};
     buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buf.memory = memory_type;
@@ -91,11 +91,11 @@ V4l2Buffer V4l2Device::query_buffer(v4l2_memory memory_type, uint32_t buf_index)
     return buf;
 }
 
-V4l2Capability V4l2Device::get_capability() const {
+V4l2Capability V4L2DeviceControl::get_capability() const {
     return cap_;
 }
 
-int V4l2Device::queue_buffer(V4l2Buffer &buffer) {
+int V4L2DeviceControl::queue_buffer(V4l2Buffer &buffer) {
     auto ioctl_res = ioctl(fd_, VIDIOC_QBUF, &buffer);
     if (ioctl_res) {
         raise_error("VIDIOC_QBUF failed");
@@ -103,21 +103,21 @@ int V4l2Device::queue_buffer(V4l2Buffer &buffer) {
     return ioctl_res;
 }
 
-int V4l2Device::dequeue_buffer(V4l2Buffer *buffer) {
+int V4L2DeviceControl::dequeue_buffer(V4l2Buffer *buffer) {
     return ioctl(fd_, VIDIOC_DQBUF, buffer);
 }
 
-void V4l2Device::start() {
+void V4L2DeviceControl::start() {
     enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(fd_, VIDIOC_STREAMON, &type))
         raise_error("VIDIOC_STREAMON failed");
 }
-void V4l2Device::stop() {
+void V4L2DeviceControl::stop() {
     enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(fd_, VIDIOC_STREAMOFF, &type))
         raise_error("VIDIOC_STREAMOFF failed");
 }
-void V4l2Device::reset() {}
+void V4L2DeviceControl::reset() {}
 
 V4l2HwIdentification::V4l2HwIdentification(const V4l2Capability cap,
                                            const std::shared_ptr<I_PluginSoftwareInfo> &plugin_sw_info) :

@@ -27,7 +27,7 @@ constexpr size_t data_stream_buffer_size   = 1 * 1024;
 constexpr size_t device_buffer_size   = 8 * 1024 * 1024;
 constexpr size_t device_buffer_number = 32;
 
-V4l2DataTransfer::V4l2DataTransfer(std::shared_ptr<V4l2Device> device, uint32_t raw_event_size_bytes) :
+V4l2DataTransfer::V4l2DataTransfer(std::shared_ptr<V4L2DeviceControl> device, uint32_t raw_event_size_bytes) :
     DataTransfer(raw_event_size_bytes,
                  DataTransfer::BufferPool::make_bounded(data_stream_buffer_number, data_stream_buffer_size),
                  allow_buffer_drop),

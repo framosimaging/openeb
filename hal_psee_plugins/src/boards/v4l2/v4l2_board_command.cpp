@@ -55,7 +55,7 @@ V4L2BoardCommand::V4L2BoardCommand(std::string media_path) {
     // One needs to directly use the /dev/v4l-subdevX device. (v4l2-dbg -d /dev/v4l-subdev1)
     struct stat st;
 
-    device_ = std::make_shared<V4l2Device>("/dev/video0");
+    device_ = std::make_shared<V4L2DeviceControl>("/dev/video0");
 
     // TODO: get video_path_ and sensor_subdev_path_ from media_path when available.
     // Hack for now, let's just dismiss the /dev/mediaX device and hardcode the video and sensor subdev path.
@@ -157,7 +157,7 @@ void V4L2BoardCommand::write_device_register(uint32_t device, uint32_t address, 
     }
 }
 
-std::shared_ptr<V4l2Device> V4L2BoardCommand::get_device() {
+std::shared_ptr<V4L2DeviceControl> V4L2BoardCommand::get_device_control() {
     return device_;
 }
 

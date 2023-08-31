@@ -30,7 +30,7 @@ class BoardCommand;
 class DataTransfer;
 
 // FIXME: should not be a DeviceControl, just way to interact with v4l2.
-class V4l2Device;
+class V4L2DeviceControl;
 
 class V4L2BoardCommand: public virtual BoardCommand {
 public:
@@ -53,7 +53,7 @@ public:
     // @brief Create a new DataTransfer object to stream the currently opened device
     std::unique_ptr<DataTransfer> build_data_transfer(uint32_t raw_event_size_bytes) override;
     void transfer_tz_frame(TzCtrlFrame &req) override;
-    std::shared_ptr<V4l2Device> get_device();
+    std::shared_ptr<V4L2DeviceControl> get_device_control();
 
 private:
     /* bool clear_endpoint(); */
@@ -61,7 +61,7 @@ private:
 
     // Board state
     // dd
-    std::shared_ptr<V4l2Device> device_;
+    std::shared_ptr<V4L2DeviceControl> device_;
     std::mutex tz_control_mutex_;
     std::string manufacturer;
     std::string product;

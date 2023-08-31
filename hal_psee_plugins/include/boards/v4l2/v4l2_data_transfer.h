@@ -16,16 +16,16 @@
 
 namespace Metavision {
 
-class V4l2Device;
+class V4L2DeviceControl;
 class V4l2DeviceUserPtr; // @TODO Replace with a V4l2 Buffer class interface
 
 class V4l2DataTransfer : public DataTransfer {
 public:
-    V4l2DataTransfer(std::shared_ptr<V4l2Device> device, uint32_t raw_event_size_bytes);
+    V4l2DataTransfer(std::shared_ptr<V4L2DeviceControl> device, uint32_t raw_event_size_bytes);
     ~V4l2DataTransfer();
 
 private:
-    std::shared_ptr<V4l2Device> device_;
+    std::shared_ptr<V4L2DeviceControl> device_;
     std::unique_ptr<V4l2DeviceUserPtr> buffers;
 
     void start_impl(BufferPtr buffer) override final;

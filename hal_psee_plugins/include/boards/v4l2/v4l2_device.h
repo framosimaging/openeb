@@ -30,7 +30,7 @@ using V4l2Capability     = struct v4l2_capability;
 using V4l2Buffer         = struct v4l2_buffer;
 using V4l2RequestBuffers = struct v4l2_requestbuffers;
 
-class V4l2Device : public DeviceControl {
+class V4L2DeviceControl : public DeviceControl {
     V4l2Capability cap_;
     int fd_ = -1;
 
@@ -51,8 +51,8 @@ public:
         return std::distance(beg, it_pp) * sizeof(*beg);
     }
 
-    V4l2Device(const std::string &dev_name);
-    virtual ~V4l2Device() = default;
+    V4L2DeviceControl(const std::string &dev_name);
+    virtual ~V4L2DeviceControl() = default;
 
     V4l2Capability get_capability() const;
 

@@ -22,7 +22,7 @@
 
 using namespace Metavision;
 
-V4l2DeviceMmap::V4l2DeviceMmap(std::shared_ptr<V4l2Device> device, unsigned int nb_buffers) : device_(device) {
+V4l2DeviceMmap::V4l2DeviceMmap(std::shared_ptr<V4L2DeviceControl> device, unsigned int nb_buffers) : device_(device) {
     auto granted_buffers = device->request_buffers(V4L2_MEMORY_MMAP, nb_buffers);
 
     for (uint32_t i = 0; i < granted_buffers.count; ++i) {
@@ -72,7 +72,7 @@ int V4l2DeviceMmap::poll_buffer() const {
 /** Return the buffer address and size (in bytes) designed by the index. */
 std::pair<void *, std::size_t> V4l2DeviceMmap::get_buffer_desc(int idx) const {
     auto desc = buffers_desc_.at(idx);
-    return std::make_pair(desc.start, V4l2Device::nb_not_null_data(desc.start, desc.length));
+    return std::make_pair(desc.start, V4L2DeviceControl::nb_not_null_data(desc.start, desc.length));
 }
 
 void V4l2DeviceMmap::free_buffers() {

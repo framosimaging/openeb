@@ -22,7 +22,7 @@ namespace Metavision {
  */
 class V4l2DeviceMmap {
 public:
-    V4l2DeviceMmap(std::shared_ptr<V4l2Device> device, unsigned int nb_buffers = 32);
+    V4l2DeviceMmap(std::shared_ptr<V4L2DeviceControl> device, unsigned int nb_buffers = 32);
     ~V4l2DeviceMmap();
 
     /** Release the buffer designed by the index to the driver. */
@@ -44,7 +44,7 @@ private:
         std::size_t length; /* In bytes. */
     };
 
-    std::shared_ptr<V4l2Device> device_;
+    std::shared_ptr<V4L2DeviceControl> device_;
     std::vector<BufferDesc> buffers_desc_;
 
     void free_buffers();
