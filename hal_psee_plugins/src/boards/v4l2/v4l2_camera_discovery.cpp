@@ -75,12 +75,18 @@ bool V4l2CameraDiscovery::discover(DeviceBuilder &device_builder, const std::str
 
     auto &main_device  = devices_[0];
 
+    auto res = false;
     try {
-        builder->build_device(main_device, device_builder, config);
+        res = builder->build_device(main_device, device_builder, config);
     } catch (std::exception &e) { MV_HAL_LOG_ERROR() << "Failed to build streaming facilities :" << e.what(); }
 
-    MV_HAL_LOG_INFO() << "V4l2 Discovery with great success +1";
-    return true;
+    if (res) {
+        MV_HAL_LOG_INFO() << "V4l2 Discovery with great success +1";
+    } else {
+        MV_HAL_LOG_INFO() << "V4l2 Discovery failed with horrible failure -1";
+
+    }
+    return res;
 }
 
 } // namespace Metavision
