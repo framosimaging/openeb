@@ -108,6 +108,7 @@ static void imx636_spawn_facilities(DeviceBuilder &device_builder,
         std::make_unique<Gen41DigitalEventMask>(register_map, "ro/digital_mask_pixel_"));
 
     device_builder.add_facility(std::make_unique<Gen41DigitalCrop>(register_map, ""));
+    device_builder.add_facility(std::make_unique<V4l2Synchronization>());
 }
 
 
