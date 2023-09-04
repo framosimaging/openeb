@@ -120,38 +120,38 @@ typedef struct {
     size_t size;
     FacilitySpawnerFunction spawn_facilities;
     std::vector<MatchPattern> opt_match_list;
-} SensorBuildConfig;
+} SensorDescriptor;
 
 // TODO: automatically register regmaps and facilities methods (at regmap deefinition time)
-std::vector<SensorBuildConfig> supported_sensors = {
+std::vector<SensorDescriptor> supported_sensors = {
     {
         GenX320ESRegisterMap, GenX320ESRegisterMapSize,
         genx320_spawn_facilities,
-        {},
-    },
-    {
-        Imx636RegisterMap, Imx636RegisterMapSize,
-        imx636_spawn_facilities,
         {
-            {.addr = 0xF128, .value = 0b00, .mask = 3}
+            {.addr = 0x14, .value = 0x30501C01, .mask = 0xFFFFFFFF} ,
         },
     },
     {
         Imx636RegisterMap, Imx636RegisterMapSize,
         imx636_spawn_facilities,
         {
-            {.addr = 0xF128, .value = 0b10, .mask = 3} ,
+            {.addr = 0x14, .value = 0xA0401806, .mask = 0xFFFFFFFF} ,
+            {.addr = 0xF128, .value = 0b00, .mask = 0x00000003}
+        },
+    },
+    {
+        Imx636RegisterMap, Imx636RegisterMapSize,
+        imx636_spawn_facilities,
+        {
+            {.addr = 0x14, .value = 0xA0401806, .mask = 0xFFFFFFFF} ,
+            {.addr = 0xF128, .value = 0b10, .mask = 0x00000003} ,
         },
     },
 };
 
-static SensorBuildConfig* get_sensor_config(std::shared_ptr<BoardCommand>cmd , uint32_t chip_id) {
-    auto it = std::find_if(supported_sensors.begin(), supported_sensors.end(), [chip_id, cmd](const SensorBuildConfig& config) {
-        return std::any_of(config.regmap, config.regmap + config.size, [chip_id](RegmapElement& element) {
-            return element.type == TypeRegmapElement::F &&
-                   std::string("chip_id") == element.field_data.name &&
-                   element.field_data.default_value == chip_id;
-        }) && match(cmd, config.opt_match_list);
+static SensorDescriptor* get_sensor_descriptor(std::shared_ptr<BoardCommand>cmd , uint32_t chip_id) {
+    auto it = std::find_if(supported_sensors.begin(), supported_sensors.end(), [chip_id, cmd](const SensorDescriptor& config) {
+        return match(cmd, config.opt_match_list);
     });
 
     if (it != supported_sensors.end()) {
@@ -165,12 +165,12 @@ bool V4L2DeviceBuilder::build_device(std::shared_ptr<BoardCommand> cmd,
                                     Metavision::DeviceBuilder &device_builder, const Metavision::DeviceConfig &config) {
 
     auto chip_id = cmd->read_device_register(0, 0x14)[0];
-    auto regmap_info = get_sensor_config(cmd, chip_id);
-    if (regmap_info == nullptr || !match(cmd, regmap_info->opt_match_list)) {
+    auto sensor_descriptor = get_sensor_descriptor(cmd, chip_id);
+    if (sensor_descriptor == nullptr || !match(cmd, sensor_descriptor->opt_match_list)) {
         return false;
     }
 
-    auto regmap_data = RegisterMap::RegmapData(1 ,std::make_tuple(regmap_info->regmap, regmap_info->size, "", 0));
+    auto regmap_data = RegisterMap::RegmapData(1 ,std::make_tuple(sensor_descriptor->regmap, sensor_descriptor->size, "", 0));
 
     auto register_map = std::make_shared<RegisterMap>(regmap_data);
     register_map->set_read_cb([cmd](uint32_t address) {
@@ -180,9 +180,12 @@ bool V4L2DeviceBuilder::build_device(std::shared_ptr<BoardCommand> cmd,
 
     auto v4l2cmd = std::dynamic_pointer_cast<V4L2BoardCommand>(cmd);
 
-    auto hw_identification = device_builder.add_facility(
-        std::make_unique<V4l2HwIdentification>(v4l2cmd->get_device_control()->get_capability(), device_builder.get_plugin_software_info()));
     auto ctrl = v4l2cmd->get_device_control();
+    auto cap = ctrl->get_capability();
+    auto software_info = device_builder.get_plugin_software_info();
+    auto hw_identification = device_builder.add_facility(
+        std::make_unique<V4l2HwIdentification>(cap, software_info));
+
     try {
         size_t raw_size_bytes = 0;
         auto format           = StreamFormat(hw_identification->get_current_data_encoding_format());
@@ -191,7 +194,7 @@ bool V4L2DeviceBuilder::build_device(std::shared_ptr<BoardCommand> cmd,
             v4l2cmd->build_data_transfer(raw_size_bytes), hw_identification, decoder, ctrl));
     } catch (std::exception &e) { MV_HAL_LOG_WARNING() << "System can't stream:" << e.what(); }
 
-    regmap_info->spawn_facilities(device_builder, config, hw_identification->get_sensor_info(), register_map);
+    sensor_descriptor->spawn_facilities(device_builder, config, hw_identification->get_sensor_info(), register_map);
 
     return true;
 }
