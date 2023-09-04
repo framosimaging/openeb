@@ -158,7 +158,7 @@ static SensorDescriptor* get_sensor_descriptor(std::shared_ptr<BoardCommand>cmd 
 }
 
 bool V4L2DeviceBuilder::build_device(std::shared_ptr<BoardCommand> cmd,
-                                    Metavision::DeviceBuilder &device_builder, const Metavision::DeviceConfig &config) {
+                                    DeviceBuilder &device_builder, const DeviceConfig &config) {
 
     auto chip_id = cmd->read_device_register(0, 0x14)[0];
     auto sensor_descriptor = get_sensor_descriptor(cmd, chip_id);
@@ -186,7 +186,7 @@ bool V4L2DeviceBuilder::build_device(std::shared_ptr<BoardCommand> cmd,
         size_t raw_size_bytes = 0;
         auto format           = StreamFormat(hw_identification->get_current_data_encoding_format());
         auto decoder          = make_decoder(device_builder, format, raw_size_bytes, false);
-        device_builder.add_facility(std::make_unique<Metavision::I_EventsStream>(
+        device_builder.add_facility(std::make_unique<I_EventsStream>(
             v4l2cmd->build_data_transfer(raw_size_bytes), hw_identification, decoder, ctrl));
     } catch (std::exception &e) { MV_HAL_LOG_WARNING() << "System can't stream:" << e.what(); }
 
