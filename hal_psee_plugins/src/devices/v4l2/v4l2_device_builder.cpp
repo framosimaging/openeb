@@ -40,17 +40,13 @@
 #include "metavision/psee_hw_layer/devices/common/event_trail_filter.h"
 
 #include "boards/v4l2/v4l2_device.h"
+#include "boards/v4l2/v4l2_hardware_identification.h"
 
 #include "devices/v4l2/v4l2_device_builder.h"
 #include "utils/make_decoder.h"
+#include "devices/common/sensor_descriptor.h"
 
 namespace Metavision {
-
-struct MatchPattern {
-    uint32_t addr;
-    uint32_t value;
-    uint32_t mask;
-};
 
 static bool match(std::shared_ptr<BoardCommand> cmd, std::vector<MatchPattern> match_list) {
     for (auto match: match_list) {
@@ -114,13 +110,6 @@ static void imx636_spawn_facilities(DeviceBuilder &device_builder,
     device_builder.add_facility(std::make_unique<Gen41DigitalCrop>(register_map, ""));
 }
 
-using FacilitySpawnerFunction = std::function<void(DeviceBuilder&, const DeviceConfig&, I_HW_Identification::SensorInfo, std::shared_ptr<RegisterMap>)>;
-typedef struct {
-    RegmapElement* regmap;
-    size_t size;
-    FacilitySpawnerFunction spawn_facilities;
-    std::vector<MatchPattern> opt_match_list;
-} SensorDescriptor;
 
 // TODO: automatically register regmaps and facilities methods (at regmap deefinition time)
 std::vector<SensorDescriptor> supported_sensors = {
@@ -130,6 +119,8 @@ std::vector<SensorDescriptor> supported_sensors = {
         {
             {.addr = 0x14, .value = 0x30501C01, .mask = 0xFFFFFFFF} ,
         },
+        {320, 0, "GenX320"},
+        "EVT21;height=320;width=320",
     },
     {
         Imx636RegisterMap, Imx636RegisterMapSize,
@@ -138,6 +129,8 @@ std::vector<SensorDescriptor> supported_sensors = {
             {.addr = 0x14, .value = 0xA0401806, .mask = 0xFFFFFFFF} ,
             {.addr = 0xF128, .value = 0b00, .mask = 0x00000003}
         },
+        {4, 2, "IMX636"},
+        "EVT3;height=720;width=1280",
     },
     {
         Imx636RegisterMap, Imx636RegisterMapSize,
@@ -146,6 +139,8 @@ std::vector<SensorDescriptor> supported_sensors = {
             {.addr = 0x14, .value = 0xA0401806, .mask = 0xFFFFFFFF} ,
             {.addr = 0xF128, .value = 0b10, .mask = 0x00000003} ,
         },
+        {4, 2, "IMX646"},
+        "EVT3;height=720;width=1280",
     },
 };
 
@@ -184,7 +179,7 @@ bool V4L2DeviceBuilder::build_device(std::shared_ptr<BoardCommand> cmd,
     auto cap = ctrl->get_capability();
     auto software_info = device_builder.get_plugin_software_info();
     auto hw_identification = device_builder.add_facility(
-        std::make_unique<V4l2HwIdentification>(cap, software_info));
+        std::make_unique<V4l2HwIdentification>(cap, software_info, *sensor_descriptor));
 
     try {
         size_t raw_size_bytes = 0;
