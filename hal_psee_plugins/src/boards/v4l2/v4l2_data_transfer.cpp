@@ -24,8 +24,10 @@ constexpr bool allow_buffer_drop           = true;
 constexpr size_t data_stream_buffer_number = 32;
 constexpr size_t data_stream_buffer_size   = 1 * 1024;
 
-constexpr size_t device_buffer_size   = 8 * 1024 * 1024;
-constexpr size_t device_buffer_number = 3;
+// TODO: get information from driver.
+constexpr size_t max_frame_size   = 8 * 1000 * 1000; // maximum frame size (for a 20ms period at 800Mbps on 2 lanes)
+constexpr size_t device_buffer_size   = max_frame_size + (0x1000 - (max_frame_size % 0x1000)); // packet size * maximum number of packets + 1 in a frame.
+constexpr size_t device_buffer_number = 32;
 
 V4l2DataTransfer::V4l2DataTransfer(std::shared_ptr<V4L2DeviceControl> device, uint32_t raw_event_size_bytes) :
     DataTransfer(raw_event_size_bytes,
@@ -64,8 +66,6 @@ void V4l2DataTransfer::run_impl() {
         std::memcpy(local_buff->data(), data, data_length);
         transfer_data(local_buff);
 
-        // Reset the buffer data
-        memset(data, 0, data_length);
 
         buffers->release_buffer(idx);
     }

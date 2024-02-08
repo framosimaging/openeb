@@ -21,6 +21,8 @@
 #include <sys/ioctl.h>
 
 using namespace Metavision;
+constexpr size_t max_frame_size   = 8 * 1000 * 1000; // maximum frame size (for a 20ms period at 800Mbps on 2 lanes)
+constexpr size_t device_buffer_size   = max_frame_size + (0x1000 - (max_frame_size % 0x1000)); // packet size * maximum number of packets + 1 in a frame.
 
 void Metavision::raise_error(const std::string &str) {
     throw std::runtime_error(str + " (" + std::to_string(errno) + " - " + std::strerror(errno) + ")");
@@ -57,10 +59,10 @@ V4L2DeviceControl::V4L2DeviceControl(const std::string &dev_name) {
     struct v4l2_format fmt;
     std::memset(&fmt, 0, sizeof(fmt));
     fmt.type                = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-    fmt.fmt.pix.field       = V4L2_FIELD_ANY;
-    fmt.fmt.pix.width       = 65536;
-    fmt.fmt.pix.height      = 64;
+    fmt.fmt.pix.pixelformat = v4l2_fourcc('P', 'S', '8', ' ');
+    fmt.fmt.pix.field       = V4L2_FIELD_NONE;
+    fmt.fmt.pix.width       = 0x1000;
+    fmt.fmt.pix.height      = device_buffer_size / fmt.fmt.pix.width;
 
     if (ioctl(fd_, VIDIOC_S_FMT, &fmt))
         raise_error("VIDIOC_S_FMT failed");

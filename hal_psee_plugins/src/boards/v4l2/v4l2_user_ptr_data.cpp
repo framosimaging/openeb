@@ -87,7 +87,7 @@ int V4l2DeviceUserPtr::poll_buffer() const {
 /** Return the buffer address and size (in bytes) designed by the index. */
 std::pair<void *, std::size_t> V4l2DeviceUserPtr::get_buffer_desc(int idx) const {
     auto desc = buffers_desc_.at(idx);
-    return std::make_pair(desc.start, V4L2DeviceControl::nb_not_null_data(desc.start, length_));
+    return std::make_pair(desc.start, length_);
 }
 
 void V4l2DeviceUserPtr::free_buffers() {
