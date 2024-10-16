@@ -366,6 +366,9 @@ add_subdirectory(hal)
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/hal_psee_plugins/CMakeLists.txt")
     add_subdirectory(hal_psee_plugins)
 endif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/hal_psee_plugins/CMakeLists.txt")
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/hal_framos_imx636_plugin/CMakeLists.txt")
+    add_subdirectory(hal_framos_imx636_plugin)
+endif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/hal_framos_imx636_plugin/CMakeLists.txt")
 
 ################################
 #             SDK             ##
